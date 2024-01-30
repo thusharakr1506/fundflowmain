@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-
+from budget import views
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("transactions/all/",views.TransactionListView.as_view(),name="transaction-list"),
+    path("transactions/add/",views.TransactionCreateView.as_view(),name="transaction-add"),
 ]
