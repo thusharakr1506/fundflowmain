@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.db.models import Sum
 from django.utils.decorators import method_decorator
 from django.contrib import messages
+from django.views.decorators.cache import never_cache
 
 def signin_required(fn):
 
@@ -19,7 +20,7 @@ def signin_required(fn):
             return fn(request,*args,**kwargs)   
     return wrapper
 
-
+decs=[signin_required,never_cache]
 
 class TransactionForm(forms.ModelForm):
 
@@ -54,7 +55,7 @@ class LoginForm(forms.Form):
 # url:localhost:8000/transactions/all/
 # method:get
 
-@method_decorator(signin_required,name="dispatch")
+@method_decorator(decs,name="dispatch")
 class TransactionListView(View):
     def get(self,request,*args,**kwargs):
         qs=Transaction.objects.filter(user_object=request.user)
@@ -97,7 +98,7 @@ class TransactionListView(View):
 # method:get,post
     
 
-@method_decorator(signin_required,name="dispatch")    
+@method_decorator(decs,name="dispatch")    
 class TransactionCreateView(View):
     def get(self,request,*args,**kwargs):
         form=TransactionForm()
@@ -120,7 +121,7 @@ class TransactionCreateView(View):
 # url:localhost:8000/transactions/{id}/
 # method:get
 
-@method_decorator(signin_required,name="dispatch")
+@method_decorator(decs,name="dispatch")
 class TransactionDetailView(View):
     def get(self,request,*args,**kwargs):
         id=kwargs.get("pk")
@@ -132,7 +133,7 @@ class TransactionDetailView(View):
 # url:localhost:8000/transactions/{id}/remove/
 # method:get
 
-@method_decorator(signin_required,name="dispatch")    
+@method_decorator(decs,name="dispatch")    
 class TransactionDeleteView(View):
     def get(self,request,*args,**kwargs):
         id=kwargs.get("pk")
@@ -144,7 +145,7 @@ class TransactionDeleteView(View):
 # url:localhost:8000/transactions/{id}/change/
 # method:get,post
     
-@method_decorator(signin_required,name="dispatch")
+@method_decorator(decs,name="dispatch")
 class TransactionUpdateView(View):
 
     def get(self,request,*args,**kwargs):
@@ -205,7 +206,7 @@ class SignInView(View):
                 return redirect("transaction-list")
         return render(request,"signin.html",{"form":form})
 
-@method_decorator(signin_required,name="dispatch")
+@method_decorator(decs,name="dispatch")
 class SignoutView(View):
     def get(self,request,*args,**kwargs):
         logout(request)
